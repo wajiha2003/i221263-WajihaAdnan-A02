@@ -1,0 +1,4 @@
+  File "/home/kali/Documents/i221263-WajihaAdnan-A02/verify_transcript.py", line 15
+    echo "=========================================="
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: invalid syntax

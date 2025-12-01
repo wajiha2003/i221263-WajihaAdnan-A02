@@ -1,0 +1,64 @@
+# Certificates and Private Keys (NEVER commit these!)
+*.pem
+*.key
+*.crt
+*.csr
+*.srl
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Transcripts and receipts (may contain sensitive data)
+*transcript*.txt
+*receipt*.json
+
+# PCAP files (may contain network traffic)
+*.pcap
+*.pcapng
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test outputs
+test_*.txt
+debug_*.json

@@ -1,0 +1,2 @@
+[DEBUG] server hello: {'type': 'error', 'reason': 'BAD CERT: signature verify failed: '}
+Server error: {'type': 'error', 'reason': 'BAD CERT: signature verify failed: '}

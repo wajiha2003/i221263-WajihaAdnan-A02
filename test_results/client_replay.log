@@ -1,0 +1,6 @@
+[*] Message 1 sent, server response: {'type': 'ack', 'seq': 1}
+[*] Message 2 sent, server response: {'type': 'ack', 'seq': 2}
+
+[!] REPLAYING Message 1 (should be rejected)...
+[*] Server response to replay: {'type': 'error', 'reason': 'seq mismatch', 'expected': 3}
+[✓] REPLAY DETECTED AND BLOCKED

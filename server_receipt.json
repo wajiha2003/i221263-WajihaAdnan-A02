@@ -1,0 +1,8 @@
+{
+  "type": "receipt",
+  "peer": "client",
+  "first_seq": 1,
+  "last_seq": 1,
+  "transcript_sha256": "4a09496273846883429d36220da2845736b2a79c7f7dd47918b8e8ad9af84d43",
+  "sig": "e1CNtL8aj7L6nmFUmvHQegmz151eoUwOMUlO4QIbrUuq59kACfaLk+oldEQsB8TUtFaFN+lWVTz2ZkT+q0hc4687tgY9A9DzBaTeg1BncLOBnc8NFo5a+k0nyXqe3fZhRAeRo0WUZEzJtexnmrq+okHCG+aNeyw7jpmmihwsTjWgTfRc723X7GRbzwPB/TE788JhevvdikO3TIWEXUzFqIfDvJNz8UW8exM+ua4HdTO1GKwEvYbVNX5tTugLifcRwiOoA5mkxLxdNVhgnmZgKxR+wic4yIDrOVzHj+/QizZrsrjOXQ0s8Am7GkOlqqzBe4SG18jdjZTMSAHMiMZzGQ=="
+}

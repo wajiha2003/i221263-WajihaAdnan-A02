@@ -1,0 +1,3 @@
+[!] Sending tampered message (modified ciphertext)...
+[*] Server response: {'type': 'error', 'reason': 'sig fail'}
+[✓] TAMPERING DETECTED

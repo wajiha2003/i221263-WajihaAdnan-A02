@@ -1,0 +1,220 @@
+# Secure Chat Application
+
+A certificate-based secure chat system with mutual TLS authentication, encrypted messaging, and non-repudiation guarantees.
+
+## Features
+
+- **PKI-based Authentication**: Mutual certificate verification using custom CA
+- **Secure Registration/Login**: Salted SHA256 password hashing with constant-time comparison
+- **End-to-End Encryption**: AES-128-CBC with ephemeral Diffie-Hellman key exchange
+- **Message Integrity**: RSA signatures on every message with replay protection
+- **Non-Repudiation**: Cryptographic session receipts for audit trails
+
+## Architecture
+
+```
+Client                                    Server
+  |                                         |
+  |---(1) ClientCert + DH_pub1------------->|
+  |<--(2) ServerCert + DH_pub2 -------------|
+  |     [Verify certs, derive ephemeral_key]|
+  |---(3) Encrypted{mode,user,pwd}--------->|
+  |<--(4) Auth Result-----------------------|
+  |---(5) DH_A (new session)--------------->|
+  |<--(6) DH_B------------------------------|
+  |     [Derive session_key]                |
+  |---(7) Encrypted+Signed Messages-------->|
+  |<--(8) ACKs-------------------------------|
+```
+
+## Prerequisites
+
+```bash
+pip install pycryptodome cryptography mysql-connector-python
+```
+
+### Generate Certificates
+
+```bash
+# 1. Create CA
+openssl genrsa -out ca_key.pem 2048
+openssl req -x509 -new -nodes -key ca_key.pem -sha256 -days 365 \
+  -out ca_cert.pem -subj "/CN=SecureChatCA"
+
+# 2. Server Certificate
+openssl genrsa -out server_key.pem 2048
+openssl req -new -key server_key.pem -out server.csr \
+  -subj "/CN=localhost"
+openssl x509 -req -in server.csr -CA ca_cert.pem -CAkey ca_key.pem \
+  -CAcreateserial -out server_cert.pem -days 365 -sha256
+
+# 3. Client Certificate
+openssl genrsa -out client_key.pem 2048
+openssl req -new -key client_key.pem -out client.csr \
+  -subj "/CN=client"
+openssl x509 -req -in client.csr -CA ca_cert.pem -CAkey ca_key.pem \
+  -CAcreateserial -out client_cert.pem -days 365 -sha256
+```
+
+## Usage
+
+### Start Server
+```bash
+python3 server.py
+# Listens on 0.0.0.0:12345
+# Uses SQLite (users.db) or MySQL if env vars set
+```
+
+### MySQL Configuration (Optional)
+```bash
+export MYSQL_HOST=localhost
+export MYSQL_USER=root
+export MYSQL_PASS=yourpassword
+export MYSQL_DB=securechat
+python3 server.py
+```
+
+### Run Client
+```bash
+python3 client.py
+```
+
+**Registration:**
+```
+r=register, l=login: r
+email: alice@example.com
+username: alice
+password: ********
+```
+
+**Login & Chat:**
+```
+r=register, l=login: l
+username: alice
+password: ********
+You: Hello, secure world!
+You: exit
+```
+
+## Security Properties
+
+### 1. PKI & Certificates
+- Mutual authentication using X.509 certificates
+- All certificates signed by trusted CA
+- Expiry validation on both sides
+- Invalid/expired certificates rejected
+
+### 2. Password Security
+- **Salt**: 16-byte random per user (`os.urandom(16)`)
+- **Hash**: `SHA256(salt || password)` stored as hex
+- **Transit**: Credentials only sent after cert validation under ephemeral encryption
+- **Timing attacks**: Constant-time comparison (`hmac.compare_digest`)
+
+### 3. Encryption
+- **Control Plane**: Ephemeral DH key for login/registration
+- **Session Key**: Fresh DH exchange post-auth: `K = SHA256(K_s)[:16]`
+- **Algorithm**: AES-128-CBC with random IV per message
+- **Padding**: PKCS#7
+
+### 4. Integrity & Non-Repudiation
+Each message includes:
+- **Digest**: `h = SHA256(seqno || timestamp || ciphertext)`
+- **Signature**: RSA-PKCS#1 v1.5 signature on `h`
+- **Replay Protection**: Strict sequence number enforcement
+
+**Transcript Format** (append-only):
+```
+seqno|timestamp|ciphertext_b64|signature_b64
+```
+
+**Session Receipt**:
+```json
+{
+  "type": "receipt",
+  "peer": "client",
+  "first_seq": 1,
+  "last_seq": 5,
+  "transcript_sha256": "abc123...",
+  "sig": "base64_rsa_signature"
+}
+```
+
+## Offline Verification
+
+### Verify Message Integrity
+```python
+import json, base64
+from Crypto.Signature import pkcs1_15
+from Crypto.Hash import SHA256
+from Crypto.PublicKey import RSA
+
+# Load client public key from cert
+pub_key = RSA.import_key(open("client_cert.pem").read())
+
+# Read transcript line
+line = "1|1701234567890|YWJjZGVm...|c2lnbmF0dXJl..."
+seq, ts, ct_b64, sig_b64 = line.split("|")
+
+# Recompute digest
+seq_b = int(seq).to_bytes(8, "big")
+ts_b = int(ts).to_bytes(8, "big")
+ct = base64.b64decode(ct_b64)
+digest = SHA256.new(seq_b + ts_b + ct)
+
+# Verify signature
+pkcs1_15.new(pub_key).verify(digest, base64.b64decode(sig_b64))
+print("✓ Message signature valid")
+```
+
+### Verify Session Receipt
+```python
+with open("server_receipt.json") as f:
+    receipt = json.load(f)
+
+# Load server public key
+srv_key = RSA.import_key(open("server_cert.pem").read())
+
+# Verify receipt signature
+th = receipt["transcript_sha256"].encode()
+digest = SHA256.new(th)
+pkcs1_15.new(srv_key).verify(digest, base64.b64decode(receipt["sig"]))
+print("✓ Session receipt valid")
+```
+
+## Testing
+
+See `TESTING.md` for:
+- PCAP analysis showing encrypted traffic
+- Certificate rejection tests
+- Replay attack prevention
+- Message tampering detection
+
+## File Structure
+
+```
+.
+├── server.py              # Server implementation
+├── client.py              # Client implementation
+├── ca_cert.pem            # CA certificate
+├── server_cert.pem        # Server certificate
+├── server_key.pem         # Server private key
+├── client_cert.pem        # Client certificate
+├── client_key.pem         # Client private key
+├── users.db               # SQLite database (auto-created)
+├── server_transcript.txt  # Server-side message log
+├── server_receipt.json    # Server session receipt
+├── client_transcript.txt  # Client-side message log
+├── client_receipt.json    # Client session receipt
+└── README.md              # This file
+```
+
+## Limitations
+
+- Single-threaded server (one client at a time)
+- No message history/persistence for chat
+- Fixed DH group (use RFC 3526 groups in production)
+- No perfect forward secrecy between sessions
+
+## License
+
+Educational project for cryptography coursework.

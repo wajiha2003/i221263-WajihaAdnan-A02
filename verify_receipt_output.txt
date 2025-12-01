@@ -1,0 +1,19 @@
+[+] Loaded public key from server_cert.pem
+[+] Loaded receipt from server_receipt.json
+
+==================================================
+Session Receipt:
+  Type: receipt
+  Peer: client
+  Message Range: 1 to 1
+  Transcript Hash: 4a09496273846883429d36220da28457...
+==================================================
+
+✅ Receipt signature VALID
+   Signed by: server_cert.pem
+   The signing party cannot deny this session.
+
+✗ Transcript hash MISMATCH
+   Expected: 4a09496273846883429d36220da2845736b2a79c7f7dd47918b8e8ad9af84d43
+   Got:      07b62a5499da6f256e480ec1da5a91b4ead0051eaa7a606ecc9ffd89a12ca8b6
+   Transcript may have been tampered with!
