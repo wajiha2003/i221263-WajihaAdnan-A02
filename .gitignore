@@ -1,0 +1,105 @@
+# Certificates and Private Keys (NEVER commit these!)
+*.pem
+*.key
+*.crt
+*.csr
+*.srl
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Transcripts and receipts (may contain sensitive data)
+*transcript*.txt
+*receipt*.json
+verify_transcript_output.txt
+verify_receipt_output.txt
+
+# Test logs
+*_normal.log
+*_register.log
+*_chat.log
+server_*.log
+client_*.log
+
+# PCAP files (may contain network traffic)
+*.pcap
+*.pcapng
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Test outputs and evidence
+test_results/
+evidence/
+
+# Temporary files
+*.bak
+*.backup
+temp/
+tmp/
+
+# Generated test scripts
+test_results/test_replay_attack.py
+test_results/test_tamper_attack.py
+test_results/*_input.txt
+test_results/*_backup.pem
+
+# Logs
+*.log
+logs/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Pytest
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
